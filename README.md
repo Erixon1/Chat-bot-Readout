@@ -145,33 +145,25 @@ docker run -d --name waha -p 3000:3000/tcp -e "WHATSAPP_HOOK_URL=http://localhos
 
 ---
 
-## 6. Ejecución de la Suite
+## 6. Ejecución y Detención de la Suite
 
-### Opción 1: Inicio Rápido con Ejecutable (Recomendado)
-Haga doble clic en el archivo **`iniciar.bat`** o ejecútelo desde la terminal:
+Tiene la opción de iniciar cada servicio de manera individual en su propia ventana dedicada (para mantener las credenciales siempre visibles) o usar el menú central:
 
-En Windows (CMD / Doble Clic):
-```cmd
-iniciar.bat
-```
+### A. Ejecución por Pasos Individuales (Recomendado)
+Dentro de la carpeta **`scripts/`**:
+- **Paso 1:** Doble clic en **`scripts/1_iniciar_waha.bat`** (o `.\scripts\1_iniciar_waha.ps1`)
+  - Enciende el contenedor Docker de WhatsApp y mantiene abierta una terminal fija con el enlace al panel `http://localhost:3000/dashboard/`, usuario y contraseña.
+- **Paso 2:** Doble clic en **`scripts/2_iniciar_app.bat`** (o `.\scripts\2_iniciar_app.ps1`)
+  - Abre una terminal independiente para la aplicación web Streamlit en `http://localhost:8501`.
+- **Paso 3:** Doble clic en **`scripts/3_detener_todo.bat`** (o `.\scripts\3_detener_todo.ps1`)
+  - Apaga ordenadamente los procesos de Streamlit y detiene el contenedor Docker de WAHA.
 
-En Windows (PowerShell):
-```powershell
-.\iniciar.ps1
-```
-
-Este script automatiza automáticamente:
-1. La verificación y arranque del contenedor Docker de WhatsApp (WAHA) en el puerto 3000.
-2. La activación del entorno virtual de Python (si existe `venv`).
-3. El despliegue de la aplicación Streamlit en el puerto 8501.
-
-### Opción 2: Ejecución Manual
-```powershell
-python -m streamlit run app.py
-```
-
-La plataforma se abrirá automáticamente en su navegador en:
-**`http://localhost:8501`**
+### B. Lanzador Central con Menú Interactivo
+Si prefiere un menú interactivo en la raíz del proyecto, ejecute **`iniciar.bat`** (o `.\iniciar.ps1`):
+- `[1]` Iniciar solo WAHA
+- `[2]` Iniciar solo Streamlit
+- `[3]` Iniciar ambos (abre dos terminales independientes automáticamente)
+- `[4]` Detener todos los servicios
 
 ---
 
@@ -179,8 +171,14 @@ La plataforma se abrirá automáticamente en su navegador en:
 
 ```
 chatbot/
-├── iniciar.bat            # Lanzador ejecutable para Windows (Doble Clic)
-├── iniciar.ps1            # Script de lanzamiento para PowerShell
+├── scripts/               # Carpeta centralizada de scripts de ejecución y control
+│   ├── 1_iniciar_waha.bat # Paso 1: Levanta Docker WAHA y muestra credenciales
+│   ├── 2_iniciar_app.bat  # Paso 2: Despliega la aplicación Streamlit
+│   ├── 3_detener_todo.bat # Paso 3: Detiene Streamlit y el contenedor Docker
+│   ├── iniciar.bat        # Menú interactivo
+│   └── iniciar.ps1        # Menú interactivo PowerShell
+├── iniciar.bat            # Acceso directo al lanzador general
+├── detener.bat            # Acceso directo para detener todos los servicios
 ├── .env.example           # Plantilla de variables de entorno
 ├── requirements.txt       # Librerías de Python requeridas
 ├── app.py                 # Aplicación principal de Streamlit con interfaz visual

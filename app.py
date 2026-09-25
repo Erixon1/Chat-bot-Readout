@@ -147,9 +147,12 @@ def get_system_health():
             import requests
             headers = {"X-Api-Key": waha_key} if waha_key else {}
             r = requests.get(f"{waha_url}/api/sessions", headers=headers, timeout=1.2)
-            if r.status_code == 200:
+            if r.status_code in (200, 201):
                 waha_ok = True
                 waha_detail = f"Servidor Docker WAHA Activo ({waha_url})"
+            elif r.status_code == 401:
+                waha_ok = True
+                waha_detail = f"Servidor Docker WAHA Activo (Autenticación requerida)"
             else:
                 waha_detail = f"WAHA respondió HTTP {r.status_code}"
         except Exception:
