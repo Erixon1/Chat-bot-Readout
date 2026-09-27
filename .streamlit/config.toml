@@ -1,10 +1,11 @@
 [theme]
 base = "dark"
-primaryColor = "#DC2626"
-backgroundColor = "#090D16"
-secondaryBackgroundColor = "#111827"
-textColor = "#F8FAFC"
-font = "sans serif"
+primaryColor = "#2E5BFF"
+backgroundColor = "#090B10"
+secondaryBackgroundColor = "#111722"
+textColor = "#F4F4F5"
+font = "Montserrat:https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+codeFont = "JetBrains Mono:https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
 
 [server]
 headless = true

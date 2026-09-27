@@ -35,3 +35,10 @@ data/*.txt
 .streamlit/secrets.toml
 .DS_Store
 Thumbs.db
+# Added by code-review-graph
+.code-review-graph/
+
+# Claude / AI tooling
+.claude/
+.mcp.json
+CLAUDE.md

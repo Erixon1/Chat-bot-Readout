@@ -9,50 +9,23 @@ module.exports = {
   darkMode: 'media',
   theme: {
     extend: {
+      // Espejo de las variables --rd-* definidas en src/styles/input.css
       colors: {
-        brand: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          900: '#7c2d12',
+        ink: {
+          950: '#0A0A0B',
+          900: '#141416',
+          850: '#1B1B1E',
+          700: '#26262B',
+          600: '#34343A',
         },
-        crimson: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          900: '#7f1d1d',
+        electric: {
+          400: '#5A7DFF',
+          500: '#2E5BFF',
         },
-        inca: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-        },
-        selva: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-        },
-        dark: {
-          950: '#090D16',
-          900: '#0F172A',
-          850: '#111827',
-          800: '#1E293B',
-          700: '#334155',
-        }
+        paper: '#ECECEE',
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        serif: ['"Fraunces"', 'Georgia', 'serif'],
+        sans: ['"Archivo"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       }
     },

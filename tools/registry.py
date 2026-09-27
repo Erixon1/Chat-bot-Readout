@@ -47,8 +47,11 @@ def dispatch(name: str, args_json: str) -> dict:
 
     if name == "registrar_sheet":
         tipo = (args.get("tipo") or "prestamo").strip().lower()
-        detalle = (args.get("detalle") or "1x Clean Code (Código Limpio) — Robert C. Martin (Fianza Ref: S/ 15.00 · Plazo: 7 días)").strip()
-        monto = (args.get("monto") or "S/ 15.00").strip()
+        detalle = (args.get("detalle") or "").strip()
+        if not detalle:
+            # Sin valores de plantilla: el modelo debe reintentar con los libros que pidió el lector
+            return {"ok": False, "detail": "Falta 'detalle' (libros, cantidades y plazos). No se registró nada."}
+        monto = (args.get("monto") or "No especificado").strip()
         fecha = args.get("fecha", "").strip()
         return log_to_sheet(tipo, detalle, monto, fecha)
 

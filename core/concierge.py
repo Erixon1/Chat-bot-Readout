@@ -5,7 +5,6 @@ import json
 import re
 from datetime import datetime, timezone
 from core.client import get_openai_client, load_prompt, CHAT_MODEL
-from tools.registry import openai_tools, dispatch
 from tools.email_sender import send_email
 from tools.sheets_logger import log_to_sheet
 from tools.whatsapp_sender import send_whatsapp
@@ -151,7 +150,9 @@ def _is_explicit_loan_intent(text: str) -> bool:
 
 def _parse_conversation_order(messages: list[dict]) -> tuple[list[str], float, bool, bool]:
     """Analiza el historial multi-turno para retener libros solicitados, cantidades y fianza."""
-    all_text_parts = [m.get("content", "") for m in messages if m.get("content")]
+    # Solo lo que escribió el lector: las respuestas de la recepción (catálogo, borradores)
+    # mencionan otros títulos y harían que se registrara el catálogo completo.
+    all_text_parts = [m.get("content", "") for m in messages if m.get("role") == "user" and m.get("content")]
     full_conversation_text = " ".join(all_text_parts).lower()
     
     detected_items: dict[str, int] = {}
@@ -355,44 +356,13 @@ def chat_with_concierge(messages: list[dict]) -> tuple[str, list[str]]:
     if is_demo:
         return demo_concierge_reply(messages)
     
-    last_user = next((m.get("content", "") for m in reversed(messages) if m.get("role") == "user"), "")
-    conf_already_requested = _was_confirmation_requested(messages)
-    user_is_confirming = _is_user_confirming(last_user)
-    
-    # Si ya se presentó un borrador y el usuario está confirmando afirmativamente, despachar herramientas
-    if conf_already_requested and user_is_confirming:
-        return demo_concierge_reply(messages)
-    
+    # El modelo conduce todo el flujo (consulta, borrador, confirmación y despacho) y redacta
+    # el comprobante a partir de los resultados reales de las herramientas.
+    from core.assistant import run_with_tools, model_error_message
     try:
         system = load_prompt("system_concierge.md")
-        formatted_messages = [{"role": "system", "content": system}]
-        for m in messages:
-            if m.get("role") in ("user", "assistant"):
-                formatted_messages.append({"role": m["role"], "content": m["content"]})
-                
-        tools = openai_tools()
-        response = client.chat.completions.create(
-            model=CHAT_MODEL,
-            messages=formatted_messages,
-            tools=tools,
-            tool_choice="auto",
-            temperature=0.5,
-            max_tokens=900
-        )
-        
-        choice = response.choices[0]
-        msg = choice.message
-        actions: list[str] = []
-        
-        if msg.tool_calls:
-            for tc in msg.tool_calls:
-                fn_name = tc.function.name
-                fn_args = tc.function.arguments
-                res = dispatch(fn_name, fn_args)
-                act_label = f"[{fn_name}] {res.get('detail', 'Ejecutado')}"
-                actions.append(act_label)
-            return demo_concierge_reply(messages)
-            
-        return msg.content or "Buenas tardes, ¿en qué libro o gestión de biblioteca le puedo colaborar hoy?", actions
-    except Exception:
-        return demo_concierge_reply(messages)
+        reply, actions = run_with_tools(client, CHAT_MODEL, system, messages, temperature=0.5)
+        return reply or "Buenas tardes, ¿en qué libro o gestión de biblioteca le puedo colaborar hoy?", actions
+    except Exception as e:
+        # Sin fallback demo en modo real: la demo ejecuta envíos reales con datos de plantilla
+        return model_error_message(e), []
